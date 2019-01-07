@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        //classpath 'com.github.johnrengelman.shadow:4.0.3'
+    }
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    //compile 'com.hivemq:hivemq-extension-sdk:4.0.0' // java9
+    compile 'com.github.yongjhih:hivemq-extension-sdk:65af6066b1' // java8
+    testCompile 'junit:junit:3.8.2'
+}
+
+tasks.withType(Test) {
+  testLogging {
+    exceptionFormat "full"
+    events "passed", "skipped", "failed", "standardOut", "standardError"
+    showStandardStreams = true
+  }
+}
+
+apply from: 'javadoc.gradle'
+
+apply plugin: 'jacoco'
+
+jacocoTestReport {
+    sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+    classDirectories =  files(sourceSets.main.output)
+    executionData = files(jacocoTestReport.executionData)
+    reports {
+        xml.enabled = true // coveralls needed
+        html.enabled = true
+    }
+}
+
+tasks.jacocoTestReport {
+    dependsOn 'test'
+}
